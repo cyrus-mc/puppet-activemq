@@ -1,0 +1,10 @@
+ACTIVEMQ_HOME=<%= @home %>
+ACTIVEMQ_BASE=<%= @home %>
+ACTIVEMQ_USER=<%= @user %>
+ACTIVEMQ_CONF=<%= @confdir %>
+ACTIVEMQ_DATA=<%= @real_data %>
+ACTIVEMQ_TMP=<%= @tmp %>
+ACTIVEMQ_PIDFILE=/var/run/activemq/activemq.pid
+ACTIVEMQ_OPTS_MEMORY="<%= @memory %>"
+ACTIVEMQ_OPTS="<%= @memory %> -Djava.util.logging.config.file=logging.properties -Djava.net.preferIPv4Stack=true"
+ACTIVEMQ_SUNJMX_START="-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=11099 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false -Djava.rmi.server.hostname=<%= @ipaddress %>"

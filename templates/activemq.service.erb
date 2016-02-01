@@ -1,0 +1,15 @@
+[Unit]
+Description=ActiveMQ
+Wants=basic.target
+After=basic.target network.target
+
+[Service]
+EnvironmentFile=-/etc/default/activemq
+Type=forking
+PIDFile=/var/run/activemq/activemq.pid
+ExecStart=<%= @home %>/bin/activemq start xbean:"<%= @home %>/conf/<%= @configfile %>"
+ExecReload=<%= @home %>/bin/activemq reload
+ExecStop=<%= @home %>/bin/activemq stop
+
+[Install]
+WantedBy=multi-user.target

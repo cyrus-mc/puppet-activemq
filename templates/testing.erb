@@ -1,0 +1,3 @@
+<%- @transportConnectors.each do |k, v| %>
+<transportConnector name=<%= k %> uri="<%= v['protocol'] %>://<%= v['port'] %>?<%= v['parameters'] %>"/>
+<%- end %>
