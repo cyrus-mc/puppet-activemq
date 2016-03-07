@@ -1,5 +1,7 @@
-class activemq::config {
-
+class activemq::config (
+  $prr = undef,
+  $vco = undef,
+) {
 
   if $activemq::cluster_enabled {
     $real_data = $activemq::real_mount['dir']

@@ -17,6 +17,8 @@ class activemq(
   $service_enabled             = true,
   $service_boot                = true,
   $uninstall                   = false,
+  $prr                         = undef,
+  $vco                         = undef,
 ) inherits activemq::params {
 
   validate_hash($default_transportConnectors)
@@ -39,7 +41,10 @@ class activemq(
 
   Anchor['activemq::begin'] ->
   class {'activemq::install':} ->
-  class {'activemq::config':} ~>
+  class {'activemq::config':
+    prr => $prr,
+    vco => $vco,
+  } ~>
   class {'activemq::service':} ->
   Anchor['activemq::end']
 

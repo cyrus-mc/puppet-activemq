@@ -7,7 +7,7 @@
    http://camel.apache.org/schema/spring/camel-spring.xsd">
 
   <bean id="idRepo" class="org.apache.camel.processor.idempotent.FileIdempotentRepository">
-    <property name="fileStore" value="<%= @real_data %>/.prr_mq_dedupe_filestore.dat"/>
+    <property name="fileStore" value="<%= @real_data %>/.amq_dedupe_filestore.dat"/>
     <property name="maxFileStoreSize" value="100000000"/>
     <property name="cacheSize" value="1000000"/>
   </bean>
