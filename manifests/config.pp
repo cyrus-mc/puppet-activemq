@@ -54,6 +54,15 @@ class activemq::config (
     content => template('activemq/activemq.xml.erb')
   }
 
+  file { '/etc/sysctl.d/10-sysctl.conf' :
+    ensure  => present,
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0644',
+    source  => 'puppet:///modules/activemq/10-sysctl.conf',
+  }
+
+
   if $::operatingsystemmajrelease == 6 {
 
     file { '/etc/init.d/activemq':

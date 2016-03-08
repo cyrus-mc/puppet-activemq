@@ -73,6 +73,20 @@
 									</deadLetterStrategy>
 								</policyEntry>
 <% end -%>
+<% if @prr -%>
+                <policyEntry topic="Filewatcher.NewDir.Synchronization.Topic">
+                    <deadLetterStrategy>
+                        <sharedDeadLetterStrategy>
+                            <deadLetterQueue>
+                                <queue physicalName="PRR.DLQ.Filewatcher.Topic"/>
+                            </deadLetterQueue>
+                        </sharedDeadLetterStrategy>
+                    </deadLetterStrategy>
+                    <pendingMessageLimitStrategy>
+                        <constantPendingMessageLimitStrategy limit="-1"/>
+                    </pendingMessageLimitStrategy>
+                </policyEntry>
+<% end -%>
 							</policyEntries>
 						</policyMap>
 					</destinationPolicy>
