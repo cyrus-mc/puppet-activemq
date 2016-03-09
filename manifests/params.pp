@@ -23,7 +23,7 @@ class activemq::params {
       'protocol'          => 'tcp',
       'network_interface' => '0.0.0.0',
       'port'              => 61616,
-      'parameters'        => 'maximumConnections=1000&amp;wireFormat.maxFrameSize=104857600'
+      'parameters'        => 'maximumConnections=1000&amp;wireFormat.maxFrameSize=209715200'
     }
   }
 }
