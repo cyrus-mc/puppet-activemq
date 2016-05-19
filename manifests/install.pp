@@ -19,6 +19,6 @@ class activemq::install {
     require    => Group['activemq']
   }
   
-  ensure_resource('package',["activemq-${activemq::version}","jdk"],{require => User['activemq'] })
+  ensure_resource('package',["activemq-${activemq::version}","java"],{require => User['activemq'] })
 
 }
