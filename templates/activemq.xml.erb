@@ -8,8 +8,12 @@
     <!-- Allows us to use system properties as variables in this configuration file -->
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="locations">
-            <value>file:${activemq.conf}/credentials.properties</value>
-            <value>file:${activemq.conf}/priority-routing-context.properties</value>
+            <list>
+                <value>file:${activemq.conf}/credentials.properties</value>
+<% if @slr -%>
+                <value>file:${activemq.conf}/priority-routing-context.properties</value>
+<% end -%>
+            </list>
         </property>
     </bean>
  
