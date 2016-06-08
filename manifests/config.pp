@@ -47,6 +47,20 @@ class activemq::config (
     content  => template('activemq/deduping.xml.erb'),
   }
 
+  file { "${activemq::confdir}/priority-routing-context.xml":
+    ensure   => present,
+    owner    => $activemq::user,
+    group    => $activemq::user,
+    source => 'puppet:///modules/activemq/priority-routing-context.xml',
+  }
+
+  file { "${activemq::confdir}/priority-routing-context.properties":
+    ensure   => present,
+    owner    => $activemq::user,
+    group    => $activemq::user,
+    source => 'puppet:///modules/activemq/priority-routing-context.properties',
+  }
+
   file { "${activemq::confdir}/${activemq::configfile}":
     ensure  => present,
     owner   => $activemq::user,

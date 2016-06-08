@@ -19,6 +19,7 @@ class activemq(
   $uninstall                   = false,
   $prr                         = undef,
   $vco                         = undef,
+  $slr                         = undef,
 ) inherits activemq::params {
 
   validate_hash($default_transportConnectors)

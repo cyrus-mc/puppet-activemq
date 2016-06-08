@@ -9,6 +9,7 @@
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="locations">
             <value>file:${activemq.conf}/credentials.properties</value>
+            <value>file:${activemq.conf}/priority-routing-context.properties</value>
         </property>
     </bean>
  
@@ -86,7 +87,10 @@
                         <constantPendingMessageLimitStrategy limit="-1"/>
                     </pendingMessageLimitStrategy>
                 </policyEntry>
-				<policyEntry queue="com.smarsh.prereviewer.services.message.requests" queuePrefetch="1"/>
+				        <policyEntry queue="com.smarsh.prereviewer.services.message.requests" queuePrefetch="1"/>
+<% end -%>
+<% if @slr -%>
+                <policyEntry queue="${solr.loader.queue.name}.processing" prioritizedMessages="true" maxPageSize="4000"/>
 <% end -%>
 							</policyEntries>
 						</policyMap>
@@ -197,5 +201,8 @@
     -->
     <import resource="jetty.xml"/>
     <import resource="deduping.xml"/>
+<% if @slr -%>
+    <import resource="priority-routing-context.xml"/>
+<% end -%>
  
 </beans>
