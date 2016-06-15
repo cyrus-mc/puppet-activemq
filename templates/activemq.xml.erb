@@ -204,7 +204,9 @@
         Take a look at ${ACTIVEMQ_HOME}/conf/jetty.xml for more details
     -->
     <import resource="jetty.xml"/>
+<% if @prr -%>
     <import resource="deduping.xml"/>
+<% end -%>
 <% if @slr -%>
     <import resource="priority-routing-context.xml"/>
 <% end -%>
