@@ -2,6 +2,7 @@ class activemq::config (
   $prr = undef,
   $vco = undef,
   $slr = undef,
+  $producerFlowControl = $activemq::params::producerFlowControl,
 ) {
 
   if $activemq::cluster_enabled {
