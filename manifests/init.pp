@@ -45,6 +45,7 @@ class activemq(
   class {'activemq::config':
     prr => $prr,
     vco => $vco,
+    slr => $slr,
   } ~>
   class {'activemq::service':} ->
   Anchor['activemq::end']
