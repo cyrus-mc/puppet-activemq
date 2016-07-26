@@ -2,8 +2,13 @@ class activemq::config (
   $prr = undef,
   $vco = undef,
   $slr = undef,
-  $producerFlowControl = $activemq::params::producerFlowControl,
 ) {
+
+  if $slr {
+    $producerFlowControl = false
+  } else {
+    $producerFlowControl = true
+  }
 
   if $activemq::cluster_enabled {
     $real_data = $activemq::real_mount['dir']

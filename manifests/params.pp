@@ -10,12 +10,6 @@ class activemq::params {
   $memory       = '-Xms1G -Xmx3G'
   $version      = hiera('activemq::version')
 
-  if $activemq::init::slr {
-    $producerFlowControl = false
-  } else {
-    $producerFlowControl = true
-  }
-
   $default_mount = {
     'dir'      => hiera('activemq::cluster_dir'),
     'options'  => '-fstype=nfs4,rw,nosuid,nodev,soft,noatime',
