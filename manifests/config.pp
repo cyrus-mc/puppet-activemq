@@ -1,6 +1,7 @@
 class activemq::config (
   $prr = undef,
   $vco = undef,
+  $slr = undef,
 ) {
 
   if $activemq::cluster_enabled {
