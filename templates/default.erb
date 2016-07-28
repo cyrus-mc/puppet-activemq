@@ -1,10 +1,14 @@
-ACTIVEMQ_HOME=<%= @home %>
-ACTIVEMQ_BASE=<%= @home %>
-ACTIVEMQ_USER=<%= @user %>
-ACTIVEMQ_CONF=<%= @confdir %>
-ACTIVEMQ_DATA=<%= @real_data %>
-ACTIVEMQ_TMP=<%= @tmp %>
-ACTIVEMQ_PIDFILE=/var/run/activemq/activemq.pid
-ACTIVEMQ_OPTS_MEMORY="<%= @memory %>"
-ACTIVEMQ_OPTS="<%= @memory %> -Djava.util.logging.config.file=logging.properties -Djava.net.preferIPv4Stack=true"
-ACTIVEMQ_SUNJMX_START="-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=11099 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false -Djava.rmi.server.hostname=<%= @ipaddress %>"
+ACTIVEMQ_HOME="/opt/apache-activemq"
+ACTIVEMQ_BASE="$ACTIVEMQ_HOME"
+<% unless [nil, :undef].include?(scope['::activemq::activemq_data']) -%>
+ACTIVEMQ_DATA="<%= scope['::activemq::activemq_data'] -%>"
+<% end -%>
+ACTIVEMQ_PIDFILE="/var/run/activemq/activemq.pid"
+#<% unless [nil, :undef].include?(scope['::activemq::activemq_opts_memory']) -%>
+ACTIVEMQ_OPTS_MEMORY="<%= scope['::activemq::activemq_opts_memory'] -%>"
+<% end -%>
+ACTIVEMQ_USER=activemq
+ACTIVEMQ_CONF="$ACTIVEMQ_BASE/conf"
+<% unless [nil, :undef].include?(scope['::activemq::activemq_opts']) -%>
+ACTIVEMQ_OPTS="<%= scope['::activemq::activemq_opts'] -%>"
+<% end -%>
