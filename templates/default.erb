@@ -1,10 +1,12 @@
-ACTIVEMQ_HOME="/opt/apache-activemq"
+<% unless [nil, :undef].include?(scope['::activemq::activemq_home']) -%>
+ACTIVEMQ_HOME="<%= scope['::activemq::activemq_home'] -%>"
+<% end -%>
 ACTIVEMQ_BASE="$ACTIVEMQ_HOME"
 <% unless [nil, :undef].include?(scope['::activemq::activemq_data']) -%>
 ACTIVEMQ_DATA="<%= scope['::activemq::activemq_data'] -%>"
 <% end -%>
 ACTIVEMQ_PIDFILE="/var/run/activemq/activemq.pid"
-#<% unless [nil, :undef].include?(scope['::activemq::activemq_opts_memory']) -%>
+<% unless [nil, :undef].include?(scope['::activemq::activemq_opts_memory']) -%>
 ACTIVEMQ_OPTS_MEMORY="<%= scope['::activemq::activemq_opts_memory'] -%>"
 <% end -%>
 ACTIVEMQ_USER=activemq

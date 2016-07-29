@@ -11,7 +11,8 @@ class activemq::params {
 
   # default configuration
   $activemq_opts_memory = hiera('activemq::activemq_opts_memory', '-Xms512m -Xmx512m')
-  $activemq_data        = hiera('activemq::activemq_data', 'ACTIVEMQ_BASE/data')
+  $activemq_home        = hiera('activemq::activemq_home', '/etc/activemq')
+  $activemq_data        = hiera('activemq::activemq_data', '$ACTIVEMQ_BASE/data')
 
   $template          = hiera('activemq::source', "${module_name}/activemq.xml.erb")
 
@@ -35,7 +36,7 @@ class activemq::params {
       parameters        => 'maximumConnections=1000&amp;wireFormat.maxFrameSize=104857600'
     },
     mqtt => {
-      protcol           => 'mqtt',
+      protocol          => 'mqtt',
       network_interface => '0.0.0.0',
       port              => '1883',
       parameters        => 'maximumConnections=1000&amp;wireFormat.maxFrameSize=104857600'
@@ -54,7 +55,7 @@ class activemq::params {
 
       $package            = hiera('activemq::package', 'activemq')
 
-      $config_path        = hiera('activemq::config_path', '/etc/activemq')
+      $config_path        = hiera('activemq::config_path', "${activemq_home}/conf")
     }
     
     default: {
