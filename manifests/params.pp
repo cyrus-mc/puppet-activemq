@@ -7,7 +7,7 @@ class activemq::params {
   $user         = 'activemq'
   $data         = "${home}/data"
   $tmp          = "${home}/tmp"
-  $memory       = '-Xms1G -Xmx3G'
+  $memory       = hiera('activemq::memory','-Xms1G -Xmx3G')
   $version      = hiera('activemq::version')
 
   $default_mount = {
