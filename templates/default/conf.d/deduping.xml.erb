@@ -1,0 +1,37 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="
+   http://www.springframework.org/schema/beans 
+   http://www.springframework.org/schema/beans/spring-beans.xsd
+   http://camel.apache.org/schema/spring 
+   http://camel.apache.org/schema/spring/camel-spring.xsd">
+
+  <bean id="idRepo" class="org.apache.camel.processor.idempotent.FileIdempotentRepository">
+    <property name="fileStore" value="<%= @real_data %>/.amq_dedupe_filestore.dat"/>
+    <property name="maxFileStoreSize" value="100000000"/>
+    <property name="cacheSize" value="1000000"/>
+  </bean>
+  <camelContext xmlns="http://camel.apache.org/schema/spring">
+    <route>
+      <from uri="activemq:queue:com.smarsh.prereviewer.filewatcher.requests.low.dupes"/>
+      <idempotentConsumer messageIdRepositoryRef="idRepo">
+        <simple>body</simple>
+        <to uri="activemq:queue:com.smarsh.prereviewer.filewatcher.requests.low.deduped"/>
+      </idempotentConsumer>
+    </route>
+    <route>
+      <from uri="activemq:queue:com.smarsh.prereviewer.filewatcher.requests.normal.dupes"/>
+      <idempotentConsumer messageIdRepositoryRef="idRepo">
+        <simple>body</simple>
+        <to uri="activemq:queue:com.smarsh.prereviewer.filewatcher.requests.normal.deduped"/>
+      </idempotentConsumer>
+    </route>
+    <route>
+      <from uri="activemq:queue:com.smarsh.prereviewer.filewatcher.requests.high.dupes"/>
+      <idempotentConsumer messageIdRepositoryRef="idRepo">
+        <simple>body</simple>
+        <to uri="activemq:queue:com.smarsh.prereviewer.filewatcher.requests.high.deduped"/>
+      </idempotentConsumer>
+    </route>
+  </camelContext>
+</beans>

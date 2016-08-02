@@ -31,6 +31,13 @@ class activemq::config {
     content => template("${module_name}/default.erb")
   }
 
+  # set link on data
+  file { "${::activemq::activemq_home}/data":
+    ensure  => 'link',
+    target  => "${::activemq::activemq_data}",
+    replace => true
+  }
+
   # deploy directory of configuration files
   # recursively evaluates templates
   if $::activemq::source_dir {

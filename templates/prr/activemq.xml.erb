@@ -164,7 +164,7 @@
         -->
         <transportConnectors>
             <!-- DOS protection, limit concurrent connections to 1000 and frame size to 100MB -->
-            <%- @real_transportConnectors.each do |k, v| -%>
+            <%- @transportConnectors.each do |k, v| -%>
             <transportConnector name="<%= k %>" uri="<%= v['protocol'] %>://<%= v['network_interface'] %>:<%= v['port'] %>?<%= v['parameters'] %>"/>
             <%- end -%>
         </transportConnectors>

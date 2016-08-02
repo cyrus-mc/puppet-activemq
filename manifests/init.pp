@@ -1,8 +1,9 @@
 class activemq (
   $activemq_home               = $::activemq::params::activemq_home,
   $activemq_data               = $::activemq::params::activemq_data,
-  $activemq_opts_memory        = $::activemq::params::activemq_opts_memory,
   $activemq_opts               = undef,
+  $activemq_opts_memory        = $::activemq::params::activemq_opts_memory,
+  $activemq_sunjmx_start       = undef,
   $networkConnectors           = $::activemq::params::networkConnectors,
   $package_ensure              = $::activemq::params::package_ensure,
   $source                      = $::activemq::params::source,

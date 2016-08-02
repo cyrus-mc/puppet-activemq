@@ -2,9 +2,7 @@
 ACTIVEMQ_HOME="<%= scope['::activemq::activemq_home'] -%>"
 <% end -%>
 ACTIVEMQ_BASE="$ACTIVEMQ_HOME"
-<% unless [nil, :undef].include?(scope['::activemq::activemq_data']) -%>
-ACTIVEMQ_DATA="<%= scope['::activemq::activemq_data'] -%>"
-<% end -%>
+ACTIVEMQ_DATA="$ACTIVEMQ_BASE/data"
 ACTIVEMQ_PIDFILE="/var/run/activemq/activemq.pid"
 <% unless [nil, :undef].include?(scope['::activemq::activemq_opts_memory']) -%>
 ACTIVEMQ_OPTS_MEMORY="<%= scope['::activemq::activemq_opts_memory'] -%>"
@@ -13,4 +11,7 @@ ACTIVEMQ_USER=activemq
 ACTIVEMQ_CONF="$ACTIVEMQ_BASE/conf"
 <% unless [nil, :undef].include?(scope['::activemq::activemq_opts']) -%>
 ACTIVEMQ_OPTS="<%= scope['::activemq::activemq_opts'] -%>"
+<% end -%>
+<% unless [nil, :undef].include?(scope['::activemq::activemq_sunjmx_start']) -%>
+ACTIVEMQ_SUNJMX_START="<%= scope['::activemq::activemq_sunjmx_start'] -%>"
 <% end -%>
