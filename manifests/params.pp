@@ -12,7 +12,7 @@ class activemq::params {
   # default configuration
   $activemq_opts_memory = hiera('activemq::activemq_opts_memory', '-Xms512m -Xmx512m')
   $activemq_home        = hiera('activemq::activemq_home', '/etc/activemq')
-  $activemq_data        = hiera('activemq::activemq_data', '$ACTIVEMQ_BASE/data')
+  $activemq_data        = hiera('activemq::activemq_data', '/var/lib/activemq/data')
 
   $template          = hiera('activemq::source', "${module_name}/activemq.xml.erb")
 
