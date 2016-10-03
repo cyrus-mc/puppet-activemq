@@ -61,7 +61,7 @@ class activemq::config (
     source => 'puppet:///modules/activemq/router.properties',
   }
 
-  file { "${activemq::confdir}/priority-router-1.0.005-SNAPSHOT.jar":
+  file { "${activemq::home}/lib/priority-router-1.0.005-SNAPSHOT.jar":
     ensure   => present,
     owner    => $activemq::user,
     group    => $activemq::user,
