@@ -3,36 +3,45 @@
   xmlns:amq="http://activemq.apache.org/schema/core"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-  http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/activemq-core.xsd">
- 
+  http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/activemq-core.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
     <!-- Allows us to use system properties as variables in this configuration file -->
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="locations">
             <list>
                 <value>file:${activemq.conf}/credentials.properties</value>
 <% if @slr -%>
-                <value>file:${activemq.conf}/priority-routing-context.properties</value>
+                <value>file:${activemq.conf}/router.properties</value>
 <% end -%>
             </list>
         </property>
     </bean>
- 
+
+<% if @slr -%>
+    <bean id="logQuery" class="io.fabric8.insight.log.log4j.Log4jLogQuery"
+        lazy-init="false" scope="singleton"
+        init-method="start" destroy-method="stop">
+    </bean>
+    <bean class="com.smarsh.jms.router.RouteConfiguration"/> 
+    <annotation-config xmlns="http://www.springframework.org/schema/context"/> 
+<% end -%>
+
     <!--
         The <broker> element is used to configure the ActiveMQ broker.
     -->
     <broker xmlns="http://activemq.apache.org/schema/core" brokerName="localhost" dataDirectory="${activemq.data}" schedulerSupport="true">
- 
+
         <!--
             For better performances use VM cursor and small memory limit.
             For more information, see:
- 
+
             http://activemq.apache.org/message-cursors.html
- 
+
             Also, if your producer is "hanging", it's probably due to producer flow control.
             For more information, see:
             http://activemq.apache.org/producer-flow-control.html
         -->
- 
+
         <destinationPolicy>
             <policyMap>
               <policyEntries>
@@ -41,9 +50,9 @@
                          slow topic consumers to block producers and affect other consumers
                          by limiting the number of messages that are retained
                          For more information, see:
- 
+
                          http://activemq.apache.org/slow-consumer-handling.html
- 
+
                     -->
                   <pendingMessageLimitStrategy>
                     <constantPendingMessageLimitStrategy limit="1000"/>
@@ -52,9 +61,9 @@
                 <policyEntry queue=">" producerFlowControl="<%= @producerFlowControl %>" memoryLimit="1mb">
                   <!-- Use VM cursor for better latency
                        For more information, see:
- 
+
                        http://activemq.apache.org/message-cursors.html
- 
+
                   <pendingQueuePolicy>
                     <vmQueueCursor/>
                   </pendingQueuePolicy>
@@ -94,13 +103,25 @@
 				        <policyEntry queue="com.smarsh.prereviewer.services.message.requests" queuePrefetch="1"/>
 <% end -%>
 <% if @slr -%>
-                <policyEntry queue="${solr.loader.queue.name}.processing" prioritizedMessages="true" maxPageSize="4000"/>
+                <policyEntry queue="com.smarsh.solrloader.general.processing" prioritizedMessages="true" maxPageSize="4000"/>
 <% end -%>
 							</policyEntries>
 						</policyMap>
 					</destinationPolicy>
 
-
+<% if @slr -%>
+        <destinationInterceptors>
+            <virtualDestinationInterceptor>
+                <virtualDestinations>
+                    <compositeQueue name="com.smarsh.solrloader.general.top">
+                        <forwardTo>
+                            <queue physicalName="com.smarsh.solrloader.general.processing"/>
+                        </forwardTo>
+                    </compositeQueue>
+                </virtualDestinations>
+            </virtualDestinationInterceptor>
+        </destinationInterceptors>
+<% end -%>
 
 <% if @prr -%>
          <plugins>
@@ -131,25 +152,25 @@
         <managementContext>
             <managementContext createConnector="false"/>
         </managementContext>
- 
+
         <!--
             Configure message persistence for the broker. The default persistence
             mechanism is the KahaDB store (identified by the kahaDB tag).
             For more information, see:
- 
+
             http://activemq.apache.org/persistence.html
         -->
         <persistenceAdapter>
             <kahaDB directory="${activemq.data}/kahadb"/>
         </persistenceAdapter>
- 
- 
+
+
           <!--
             The systemUsage controls the maximum amount of space the broker will
             use before slowing down producers. For more information, see:
             http://activemq.apache.org/producer-flow-control.html
             If using ActiveMQ embedded - the following limits could safely be used:
- 
+
         <systemUsage>
             <systemUsage>
                 <memoryUsage>
@@ -177,11 +198,11 @@
                 </tempUsage>
             </systemUsage>
         </systemUsage>
- 
+
         <!--
             The transport connectors expose ActiveMQ over a given protocol to
             clients and other brokers. For more information, see:
- 
+
             http://activemq.apache.org/configuring-transports.html
         -->
         <transportConnectors>
@@ -190,25 +211,22 @@
             <transportConnector name="<%= k %>" uri="<%= v['protocol'] %>://<%= v['network_interface'] %>:<%= v['port'] %>?<%= v['parameters'] %>"/>
             <%- end -%>
         </transportConnectors>
- 
+
         <!-- destroy the spring context on shutdown to stop jetty -->
         <shutdownHooks>
             <bean xmlns="http://www.springframework.org/schema/beans" class="org.apache.activemq.hooks.SpringContextHook" />
         </shutdownHooks>
- 
+
     </broker>
- 
+
     <!--
         Enable web consoles, REST and Ajax APIs and demos
- 
+
         Take a look at ${ACTIVEMQ_HOME}/conf/jetty.xml for more details
     -->
     <import resource="jetty.xml"/>
 <% if @prr -%>
     <import resource="deduping.xml"/>
 <% end -%>
-<% if @slr -%>
-    <import resource="priority-routing-context.xml"/>
-<% end -%>
- 
+
 </beans>
