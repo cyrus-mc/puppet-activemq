@@ -58,7 +58,7 @@
                     <constantPendingMessageLimitStrategy limit="1000"/>
                   </pendingMessageLimitStrategy>
                 </policyEntry>
-                <policyEntry queue=">" producerFlowControl="<%= @producerFlowControl %>" memoryLimit="1mb">
+                <policyEntry queue=">" producerFlowControl="<%= @producerFlowControl %>" >
                   <!-- Use VM cursor for better latency
                        For more information, see:
 
