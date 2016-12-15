@@ -1,101 +1,54 @@
-class activemq::config (
-  $prr = undef,
-  $vco = undef,
-  $slr = undef,
-) {
+class activemq::config { 
 
-  if $slr {
-    $producerFlowControl = false
-  } else {
-    $producerFlowControl = true
+  # parent class must be defined
+  if ! defined(Class['::activemq']) {
+    fail("${module_name} : You must declare class ${module_name} before ${module_name}::config")
   }
 
-  if $activemq::cluster_enabled {
-    $real_data = $activemq::real_mount['dir']
+  # validate parameters
+  validate_hash($::activemq::transportConnectors)
+  validate_hash($::activemq::networkConnectors)
 
-    autofs::include { "/- ${activemq::real_mount['mapfile']} --timeout=300 --ghost": }
+  # only allowed to specify a source or content
+  if $::activemq::source and $::activemq::template {
+    fail("${module_name} : You must provide either 'source' or 'content', not both")
+  }
 
-    autofs::directmount { $activemq::real_mount['dir']:
-      options  => $activemq::real_mount['options'],
-      location => $activemq::real_mount['location'],
-      mapfile  => $activemq::real_mount['mapfile'],
+  # resource defaults
+  File {
+    owner  => $::activemq::params::file_owner,
+    group  => $::activemq::params::file_group,
+    mode   => $::activemq::params::file_mode,
+    notify => Service[ 'activemq-service' ]
+  }
+
+  file { "${::activemq::params::config_path}/activemq.xml":
+    source  => $::activemq::source,
+    content => template("${::activemq::template}")
+  }
+
+  file { "/etc/default/activemq":
+    content => template("${module_name}/default.erb")
+  }
+
+  # set link on data
+  file { "${::activemq::activemq_home}/data":
+    ensure  => 'link',
+    target  => "${::activemq::activemq_data}",
+    replace => true
+  }
+
+  # deploy directory of configuration files
+  # recursively evaluates templates
+  if $::activemq::source_dir {
+    recursive_directory { "${::activemq::params::config_path}":
+      source_dir => "${::activemq::source_dir}",
+      dest_dir   => "${::activemq::params::config_path}",
+      owner      => "${::activemq::params::file_owner}",
+      group      => "${::activemq::params::file_group}",
+      file_mode  => "${::activemq::params::file_mode}",
+      dir_mode   => "${::activemq::params::file_mode}"
     }
   }
-  else {
-    $real_data = $activemq::data
-  }
-
-  file { '/var/run/activemq':
-    ensure => directory,
-    owner  => $activemq::user,
-    group  => $activemq::user,
-    mode   => '0755',
-  }
-
-  file { '/etc/default/activemq':
-    ensure  => present,
-    owner   => $activemq::user,
-    mode    => '0664',
-    content => template('activemq/default.erb')
-  }
-
-  file { "${activemq::home}/bin/activemq":
-    ensure => present,
-    owner  => $activemq::user,
-    group  => $activemq::user,
-    mode   => '0775',
-    source => 'puppet:///modules/activemq/activemq',
-  }
-
-  file { "${activemq::confdir}/deduping.xml":
-    ensure   => present,
-    owner    => $activemq::user,
-    group    => $activemq::user,
-    content  => template('activemq/deduping.xml.erb'),
-  }
-
-  file { "${activemq::confdir}/router.properties":
-    ensure   => present,
-    owner    => $activemq::user,
-    group    => $activemq::user,
-    source => 'puppet:///modules/activemq/router.properties',
-  }
-
-  file { "${activemq::home}/lib/priority-router-1.0.005-SNAPSHOT.jar":
-    ensure   => present,
-    owner    => $activemq::user,
-    group    => $activemq::user,
-    source => 'puppet:///modules/activemq/priority-router-1.0.005-SNAPSHOT.jar',
-  }
-
-  file { "${activemq::confdir}/${activemq::configfile}":
-    ensure  => present,
-    owner   => $activemq::user,
-    group   => $activemq::user,
-    content => template('activemq/activemq.xml.erb')
-  }
-
-  if $::operatingsystemmajrelease == 6 {
-
-    file { '/etc/init.d/activemq':
-      ensure  => present,
-      owner   => 'root',
-      group   => 'root',
-      mode    => '0755',
-      content => template('activemq/init.erb')
-    }
-  }
-  elsif  $::operatingsystemmajrelease == 7 {
-
-    file { '/usr/lib/systemd/system/activemq.service':
-      ensure  => present,
-      owner   => 'root',
-      group   => 'root',
-      mode    => '0644',
-      content => template('activemq/activemq.service.erb')
-    }
-
-  }
-
 
 }
