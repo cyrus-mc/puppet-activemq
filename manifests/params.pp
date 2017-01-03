@@ -14,7 +14,7 @@ class activemq::params {
   $activemq_home        = hiera('activemq::activemq_home', '/etc/activemq')
   $activemq_data        = hiera('activemq::activemq_data', '/var/lib/activemq/data')
 
-  $template          = hiera('activemq::source', "${module_name}/activemq.xml.erb")
+  $template          = hiera('activemq::source', "${module_name}/activemq.xml")
 
   $default_transportConnectors = {
     openwire => {

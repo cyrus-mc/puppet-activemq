@@ -24,11 +24,11 @@ class activemq::config {
 
   file { "${::activemq::params::config_path}/activemq.xml":
     source  => $::activemq::source,
-    content => template("${::activemq::template}")
+    content => epp("${::activemq::template}.epp")
   }
 
   file { "/etc/default/activemq":
-    content => template("${module_name}/default.erb")
+    content => epp("${module_name}/default.epp")
   }
 
   # set link on data
