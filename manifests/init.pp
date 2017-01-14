@@ -6,8 +6,6 @@ class activemq (
   $activemq_sunjmx_start       = undef,
   $networkConnectors           = $::activemq::params::networkConnectors,
   $package_ensure              = $::activemq::params::package_ensure,
-  $source                      = $::activemq::params::source,
-  $source_dir                  = $::activemq::params::source_dir,
   $service_enable              = $::activemq::params::service_enable,
   $service_ensure              = $::activemq::params::service_ensure,
   $source                      = undef,
