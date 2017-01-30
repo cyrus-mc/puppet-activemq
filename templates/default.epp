@@ -1,0 +1,17 @@
+<% unless $::activemq::activemq_home =~ Undef or $::activemq::activemq_home == '' { -%>
+ACTIVEMQ_HOME="<%= $::activemq::activemq_home -%>"
+<% } -%>
+ACTIVEMQ_BASE="$ACTIVEMQ_HOME"
+ACTIVEMQ_DATA="$ACTIVEMQ_BASE/data"
+ACTIVEMQ_PIDFILE="/var/run/activemq/activemq.pid"
+<% unless $::activemq::activemq_opts_memory =~ Undef { -%>
+ACTIVEMQ_OPTS_MEMORY="<%= $::activemq::activemq_opts_memory -%>"
+<% } -%>
+ACTIVEMQ_USER=activemq
+ACTIVEMQ_CONF="$ACTIVEMQ_BASE/conf"
+<% unless $::activemq::activemq_opts =~ Undef { -%>
+ACTIVEMQ_OPTS="<%= $::activemq::activemq_opts -%>"
+<% } -%>
+<% unless $::activemq::activemq_sunjmx_start =~ Undef { -%>
+ACTIVEMQ_SUNJMX_START="<%= $::activemq::activemq_sunjmx_start -%>"
+<% } -%>

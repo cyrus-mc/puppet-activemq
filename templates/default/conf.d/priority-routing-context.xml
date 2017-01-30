@@ -1,0 +1,121 @@
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context" xmlns:beans="http://www.springframework.org/schema/beans"
+    xsi:schemaLocation="
+   http://www.springframework.org/schema/beans
+   http://www.springframework.org/schema/beans/spring-beans.xsd
+   http://camel.apache.org/schema/spring
+   http://camel.apache.org/schema/spring/camel-spring.xsd
+   http://www.springframework.org/schema/context
+   http://www.springframework.org/schema/context/spring-context.xsd
+   http://www.springframework.org/schema/util
+   http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <camelContext xmlns="http://camel.apache.org/schema/spring">
+
+        <propertyPlaceholder id="properties" location="file:${activemq.conf}/priority-routing-context.properties" />
+
+        <route id="topPriorityRoute">
+            <from uri="broker:queue:{{solr.loader.queue.name}}.top" />
+            <to uri="broker:queue:{{solr.loader.queue.name}}.processing" />
+        </route>
+
+        <route id="normalPriorityRoute">
+            <from uri="activemq:queue:{{solr.loader.queue.name}}.normal" />
+            <choice>
+                <when>
+                    <simple> ${bean:processingQueueView?method=getQueueSize} >=
+                        ${properties:normal.priority.disable.threshold} </simple>
+                    <multicast>
+                        <to uri="activemq:queue:{{solr.loader.queue.name}}.normal" />
+                        <to uri="controlbus:route?routeId=normalPriorityRoute&amp;action=suspend&amp;async=true" />
+                    </multicast>
+                </when>
+                <otherwise>
+                    <to uri="activemq:queue:{{solr.loader.queue.name}}.processing" />
+                </otherwise>
+            </choice>
+        </route>
+
+        <route id="normalPriorityRouteEnabler">
+            <from uri="timer://enablerTimer?fixedRate=true&amp;period={{enable.timer.period}}" />
+            <choice>
+                <when>
+                    <simple> ${bean:processingQueueView?method=getQueueSize} &lt;=
+                        ${properties:normal.priority.enable.threshold}
+                    </simple>
+                    <to uri="controlbus:route?routeId=normalPriorityRoute&amp;action=status" />
+                    <choice>
+                        <when>
+                            <simple> ${body} == 'Suspended' </simple>
+                            <to uri="controlbus:route?routeId=normalPriorityRoute&amp;action=resume" />
+                        </when>
+                    </choice>
+                </when>
+            </choice>
+        </route>
+
+        <route id="lowPriorityRoute">
+            <from uri="activemq:queue:{{solr.loader.queue.name}}.low" />
+            <choice>
+                <when>
+                    <simple> ${bean:processingQueueView?method=getQueueSize} >=
+                        ${properties:low.priority.disable.threshold}
+                    </simple>
+                    <multicast>
+                        <to uri="activemq:queue:{{solr.loader.queue.name}}.low" />
+                        <to uri="controlbus:route?routeId=lowPriorityRoute&amp;action=suspend&amp;async=true" />
+                    </multicast>
+                </when>
+                <otherwise>
+                    <to uri="activemq:queue:{{solr.loader.queue.name}}.processing" />
+                </otherwise>
+            </choice>
+        </route>
+
+        <route id="lowRouteEnabler">
+            <from uri="timer://enablerTimer?fixedRate=true&amp;period={{enable.timer.period}}" />
+            <choice>
+                <when>
+                    <simple> ${bean:processingQueueView?method=getQueueSize} &lt;=
+                        ${properties:low.priority.enable.threshold}
+                    </simple>
+                    <to uri="controlbus:route?routeId=lowPriorityRoute&amp;action=status" />
+                    <choice>
+                        <when>
+                            <simple> ${body} == 'Suspended' </simple>
+                            <to uri="controlbus:route?routeId=lowPriorityRoute&amp;action=resume" />
+                        </when>
+                    </choice>
+                </when>
+            </choice>
+        </route>
+
+    </camelContext>
+
+    <bean id="processingQueueView" factory-bean="brokerView" factory-method="getDestinationView">
+        <constructor-arg value="${solr.loader.queue.name}.processing" />
+    </bean>
+
+    <bean id="brokerView" class="org.apache.activemq.broker.view.MessageBrokerView">
+        <constructor-arg value="${solr.loader.broker.name}" />
+    </bean>
+
+    <bean id="vmConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+        <property name="brokerURL" value="vm://${solr.loader.broker.name}?jms.prefetchPolicy.queuePrefetch=100" />
+    </bean>
+    
+    <bean id="jmsTransactionManager" class="org.springframework.jms.connection.JmsTransactionManager">
+        <constructor-arg ref="vmConnectionFactory" />
+    </bean>
+
+    <bean id="jmsConfiguration" class="org.apache.activemq.camel.component.ActiveMQConfiguration">
+        <property name="connectionFactory" ref="vmConnectionFactory" />
+        <property name="transacted" value="true" />
+        <property name="transactionManager" ref="jmsTransactionManager" />
+        <property name="concurrentConsumers" value="20"/>
+        <property name="preserveMessageQos" value="true"/>
+        <property name="jmsMessageType" value="Object"/>
+        <property name="receiveTimeout" value="10000"/>
+    </bean>
+
+</beans>
