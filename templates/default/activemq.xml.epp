@@ -133,7 +133,8 @@
             <!-- DOS protection, limit concurrent connections to 1000 and frame size to 100MB -->
             <% if $::activemq::transportConnectors =~ Hash[String, Hash, 1] {
                  $::activemq::transportConnectors.each |$k, $v| { -%>
-<transportConnector name="<%= $k %>" uri="<%= $v[protocol] %>://<%= $v[network_interface] %>:<%= $v[port] %>?<%= $v[parameters] %>"/>                                                       <%   }
+<transportConnector name="<%= $k %>" uri="<%= $v[protocol] %>://<%= $v[network_interface] %>:<%= $v[port] %>?<%= $v[parameters] %>"/>
+            <%   }
                } %>
         </transportConnectors>
 
