@@ -3,15 +3,25 @@
   xmlns:amq="http://activemq.apache.org/schema/core"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-  http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/activemq-core.xsd">
- 
+  http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/activemq-core.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
     <!-- Allows us to use system properties as variables in this configuration file -->
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="locations">
+          <list>
             <value>file:${activemq.conf}/credentials.properties</value>
-            <value>file:${activemq.conf}/priority-routing-context.properties</value>
+            <value>file:${activemq.conf}/router.properties</value>
+          </list>
         </property>
     </bean>
+
+    <bean id="logQuery" class="io.fabric8.insight.log.log4j.Log4jLogQuery"
+      lazy-init="false" scope="singleton"
+      init-method="start" destroy-method="stop">
+    </bean>
+    <bean class="com.smarsh.jms.router.RouteConfiguration"/>
+
+    <annotation-config xmlns="http://www.springframework.org/schema/context"/>
  
     <!--
         The <broker> element is used to configure the ActiveMQ broker.
@@ -56,20 +66,20 @@
                   </pendingQueuePolicy>
                   -->
                 </policyEntry>
-								<policyEntry queue=">">
-									<deadLetterStrategy>
-									<!--
-										Use the prefix 'DLQ.' for the destination name, and make
-										the DLQ a queue rather than a topic
-									-->
-									<individualDeadLetterStrategy
-										queuePrefix="DLQ." useQueueForQueueMessages="true" />
-									</deadLetterStrategy>
-								</policyEntry>
+                <policyEntry queue=">">
+                  <deadLetterStrategy>
+                  <!--
+                    Use the prefix 'DLQ.' for the destination name, and make
+                    the DLQ a queue rather than a topic
+                  -->
+                    <individualDeadLetterStrategy
+                      queuePrefix="DLQ." useQueueForQueueMessages="true" />
+                  </deadLetterStrategy>
+                </policyEntry>
                 <policyEntry queue="${solr.loader.queue.name}.processing" prioritizedMessages="true" maxPageSize="4000"/>
-							</policyEntries>
-						</policyMap>
-					</destinationPolicy>
+              </policyEntries>
+            </policyMap>
+        </destinationPolicy>
 
         <!--
             The managementContext is used to configure how ActiveMQ is exposed in
@@ -156,6 +166,5 @@
         Take a look at ${ACTIVEMQ_HOME}/conf/jetty.xml for more details
     -->
     <import resource="jetty.xml"/>
-    <import resource="priority-routing-context.xml"/>
  
 </beans>
